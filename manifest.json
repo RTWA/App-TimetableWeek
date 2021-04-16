@@ -1,0 +1,76 @@
+{
+    "name": "Timetable Week",
+    "slug": "TimetableWeek",
+    "version": "1.0.0",
+    "description": "",
+    "icon": "[\"far\", \"calendar-alt\"]",
+    "author": "WebApps",
+    "menu": [
+        {
+            "action": "",
+            "text": "Set Week",
+            "permission": "app.TimetableWeek.set"
+        },
+        {
+            "action": "settings",
+            "text": "App Settings",
+            "permission": "app.TimetableWeek.settings"
+        }
+    ],
+    "routes": [
+        {
+            "path": "/",
+            "name": "Set Week",
+            "exact": true,
+            "component": "SetWeek",
+            "permission": "app.TimetableWeek.set"
+        },
+        {
+            "path": "/settings",
+            "name": "Settings",
+            "exact": true,
+            "component": "Settings",
+            "permission": "app.TimetableWeek.settings"
+        }
+    ],
+    "permissions": [
+        {
+            "name": "app.TimetableWeek.set",
+            "title": "Set Week",
+            "guard": "web",
+            "admin": true
+        },
+        {
+            "name": "app.TimetableWeek.settings",
+            "title": "Manage App Settings",
+            "guard": "web",
+            "admin": true
+        }
+    ],
+    "settings": [
+        {
+            "key": "app.TimetableWeek.current",
+            "value": "Not Set"
+        },
+        {
+            "key": "app.TimetableWeek.active",
+            "value": "2021-01-01 00:00:00"
+        },
+        {
+            "key": "app.TimetableWeek.next",
+            "value": "Not Set"
+        },
+        {
+            "key": "app.TimetableWeek.current_label",
+            "value": "This week is"
+        },
+        {
+            "key": "app.TimetableWeek.next_label",
+            "value": "Next week is"
+        },
+        {
+            "key": "app.TimetableWeek.switchover",
+            "value": "2021-01-01 00:00:00"
+        }
+    ]
+}
