@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import classNames from 'classnames';
+import { useToasts } from 'react-toast-notifications';
+import { Button, Input, Loader, WebAppsContext } from 'webapps-react';
 
 import Permissions from './Permissions';
 
 axios.defaults.withCredentials = true;
 
 const Settings = () => {
+    const [state, setState] = useState('');
     const [current, setCurrent] = useState('loading');
     const [next, setNext] = useState('Not Set');
     const [active, setActive] = useState('0000-00-00 00:00:00');
@@ -14,11 +17,11 @@ const Settings = () => {
     const [nextLabel, setNextLabel] = useState('');
     const [tab, setTab] = useState(0);
 
+    const { UI } = useContext(WebAppsContext);
+    const { addToast } = useToasts();
+
     useEffect(() => {
         axios.get('/api/apps/TimetableWeek/value.json')
-            .then(response => {
-                return response;
-            })
             .then(json => {
                 setCurrent(json.data.value.current);
                 setNext(json.data.value.next);
@@ -33,8 +36,7 @@ const Settings = () => {
     }, []);
 
     const setData = () => {
-        // TODO: toasts
-        // let save = toast("Saving changes, please wait...", {autoClose: false});
+        setState('saving');
 
         let formData = new FormData();
         formData.append("current", current);
@@ -44,23 +46,21 @@ const Settings = () => {
         formData.append("nextLabel", nextLabel);
 
         axios.post('/api/apps/TimetableWeek/settings', formData)
-            .then(response => {
-                return response;
-            })
             .then(json => {
-                // TODO: toasts
-                // TODO: message is not sent
-                //toast.update(save, {type: toast.TYPE.SUCCESS, autoClose: 3000, render: json.data.message});
-                alert(json.data.message);
+                addToast("Settings Saved", { appearance: 'success'});
+                
+                setState('saved');
+                setTimeout(() => {
+                    setState('');
+                }, 2500);
             })
             .catch(error => {
-                // TODO: toasts
-                // toast.update(save, {
-                //     type: toast.TYPE.ERROR,
-                //     autoClose: 5000,
-                //     render: error.response.data.message || "Failed to save! " + error.response.statusText
-                // });
-                alert(error.response.data.message || "Failed to save! " + error.response.statusText);
+                addToast(error.response.data.message || "Failed to save! " + error.response.statusText, { appearance: 'error'});
+
+                setState('error');
+                setTimeout(() => {
+                    setState('');
+                }, 2500);
             });
     }
 
@@ -95,8 +95,8 @@ const Settings = () => {
         'focus:outline-none',
         (tab === id) ? 'border-b-2' : '',
         (tab === id) ? 'font-medium' : '',
-        (tab === id) ? 'border-indigo-600' : '',
-        (tab === id) ? 'dark:border-indigo:300' : ''
+        (tab === id) ? `border-${UI.theme}-600` : '',
+        (tab === id) ? `dark:border-${UI.theme}.300` : ''
     )
 
     const paneClass = id => classNames(
@@ -106,7 +106,7 @@ const Settings = () => {
 
     // render
     if (current === 'loading') {
-        return <div>Loading...</div>
+        return <Loader />
     }
 
     return (
@@ -127,7 +127,7 @@ const Settings = () => {
                             <label className="block py-2" htmlFor="current">Current Value</label>
                         </div>
                         <div className="w-full lg:w-9/12">
-                            <input type="text" name="current" id="current" className="input-field" value={current} onChange={handleChange} />
+                            <Input type="text" name="current" id="current" value={current} onChange={handleChange} state={state} />
                         </div>
                     </div>
                     <div className="flex flex-auto px-4 lg:px-10 pt-5">
@@ -135,7 +135,7 @@ const Settings = () => {
                             <label className="block py-2" htmlFor="next">Next Value</label>
                         </div>
                         <div className="w-full lg:w-9/12">
-                            <input type="text" name="next" id="next" className="input-field" value={next} onChange={handleChange} />
+                            <Input type="text" name="next" id="next" value={next} onChange={handleChange} state={state} />
                         </div>
                     </div>
 
@@ -145,7 +145,7 @@ const Settings = () => {
                             <label className="block py-2" htmlFor="currentLabel">"This week" label</label>
                         </div>
                         <div className="w-full lg:w-9/12">
-                            <input type="text" name="currentLabel" id="currentLabel" className="input-field" value={currentLabel} onChange={handleChange} />
+                            <Input type="text" name="currentLabel" id="currentLabel" value={currentLabel} onChange={handleChange} state={state} />
                         </div>
                     </div>
                     <div className="flex flex-auto px-4 lg:px-10 pt-5">
@@ -153,7 +153,7 @@ const Settings = () => {
                             <label className="block py-2" htmlFor="nextLabel">"Next week" label</label>
                         </div>
                         <div className="w-full lg:w-9/12">
-                            <input type="text" name="nextLabel" id="nextLabel" className="input-field" value={nextLabel} onChange={handleChange} />
+                            <Input type="text" name="nextLabel" id="nextLabel" value={nextLabel} onChange={handleChange} state={state} />
                         </div>
                     </div>
 
@@ -163,7 +163,7 @@ const Settings = () => {
                             <label className="block py-2" htmlFor="active">Switchover Date & Time</label>
                         </div>
                         <div className="w-full lg:w-9/12">
-                            <input type="text" name="active" id="active" className="input-field" value={active} onChange={handleChange} />
+                            <Input type="text" name="active" id="active" value={active} onChange={handleChange} state={state} />
                             <span className="text-xs text-gray-400">
                                 Format must be YYYY-MM-DD HH:MM:SS<br />
                                 The next value will be current at the time and date here.
@@ -171,10 +171,7 @@ const Settings = () => {
                         </div>
                     </div>
 
-                    <a href="#" onClick={setData}
-                        className="mx-4 lg:mx-10 px-4 py-2 border border-indigo-600 dark:border-indigo-300 hover:bg-indigo-600 dark:hover:bg-indigo-300 
-                            text-indigo-600 dark:text-indigo-300 hover:text-white dark:hover:text-black">
-                        Save Settings</a>
+                    <Button onClick={setData} style="outline">Save Settings</Button>
                 </div>
                 <div className={paneClass(1)}>
                     <Permissions />

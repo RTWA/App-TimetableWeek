@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
+import { useToasts } from 'react-toast-notifications';
+import { Button, Input, Loader, withWebApps } from 'webapps-react';
 
 axios.defaults.withCredentials = true;
 
-const SetWeek = () => {
+const SetWeek = ({ UI }) => {
     const [current, setCurrent] = useState('loading');
     const [next, setNext] = useState('Not Set');
     const [active, setActive] = useState('0000-00-00 00:00:00');
     const [custom, setCustom] = useState(null);
     const [settings, setSettings] = useState(false);
+
+    const { addToast } = useToasts();
 
     useEffect(() => {
         axios.get('/api/apps/TimetableWeek/value.json')
@@ -31,8 +33,6 @@ const SetWeek = () => {
     }, []);
 
     const setData = value => {
-        // TODO: toasts
-        // let save = toast("Setting selected option, please wait...", {autoClose: false});
 
         let formData = new FormData();
         formData.append("next", JSON.stringify(value));
@@ -42,17 +42,10 @@ const SetWeek = () => {
                 return response;
             })
             .then(json => {
-                // TODO: toasts
-                //toast.update(save, {type: toast.TYPE.SUCCESS, autoClose: 3000, render: json.data.message});
-                alert(json.data.message);
+                addToast(json.data.message, { appearance: 'success' });
             })
             .catch(error => {
-                // TODO: toasts
-                toast.update(save, {
-                    type: toast.TYPE.ERROR,
-                    autoClose: 5000,
-                    render: error.response.data.message || "Failed to save! " + error.response.statusText
-                });
+                addToast(error.response.data.message || "Failed to save! " + error.response.statusText, { appearance: 'error' });
             });
     }
 
@@ -76,26 +69,26 @@ const SetWeek = () => {
             return (
                 <div>
                     <hr className="my-4" />
-                    <Link to="/settings"
-                        className="px-4 py-2 border border-indigo-600 dark:border-indigo-300 hover:bg-indigo-600 dark:hover:bg-indigo-300 
-                          text-indigo-600 dark:text-indigo-300 hover:text-white dark:hover:text-black float-left">
-                        <FontAwesomeIcon icon={['fas', 'cog']} className="mr-1" />
+                    <Button to="/settings" style="outline" color="gray" className="float-left flex">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
                         App Settings
-                    </Link>
+                    </Button>
                 </div>
             )
         }
     }
 
-    // render
     if (current === 'loading') {
-        return <div>Loading...</div>
+        return <Loader />
     }
 
     const _active = moment(active);
     return (
         <div className="grid grid-cols-2">
-            <div className="overflow-hidden rounded-lg shadow-lg bg-white dark:bg-gray-800 border-indigo-600 dark:border-indigo-300 border-t-2 text-center mx-12 p-4">
+            <div className="overflow-hidden rounded-lg shadow-lg bg-white dark:bg-gray-800 text-center mx-12 p-4">
                 <div>
                     <h2 className="text-medium">The currently selected option is: <strong>{current}</strong></h2>
                     <h4 className="text-sm">The next selected option is: <strong>{next}</strong></h4>
@@ -107,23 +100,19 @@ const SetWeek = () => {
             </div>
 
             <div>
-                <div className="rounded-lg shadow-lg border border-indigo-600 dark:border-indigo-300 mx-12 p-4 bg-white dark:bg-gray-800 ">
-                    <div className="text-indigo-600 dark:text-indigo-300"><strong>Select the next option</strong></div>
+                <div className="rounded-lg shadow-lg mx-12 p-4 bg-white dark:bg-gray-800 ">
+                    <div className={`text-${UI.theme}-600 dark:text-${UI.theme}-300`}><strong>Select the next option</strong></div>
                     <div className="text-center">
                         <div className="flex flex-row mt-4">
                             <div className="flex-grow text-center">
-                                <a href="#" data-week="Week A" onClick={handleClick}
-                                    className="px-4 py-2 border border-indigo-600 dark:border-indigo-300 hover:bg-indigo-600 dark:hover:bg-indigo-300 
-                                                text-indigo-600 dark:text-indigo-300 hover:text-white dark:hover:text-black">
+                                <Button data-week="Week A" onClick={handleClick} style="outline">
                                     Week A
-                                </a>
+                                </Button>
                             </div>
                             <div className="flex-grow text-center">
-                                <a href="#" data-week="Week B" onClick={handleClick}
-                                    className="px-4 py-2 border border-indigo-600 dark:border-indigo-300 hover:bg-indigo-600 dark:hover:bg-indigo-300 
-                                                text-indigo-600 dark:text-indigo-300 hover:text-white dark:hover:text-black">
+                                <Button data-week="Week B" onClick={handleClick} style="outline">
                                     Week B
-                                </a>
+                                </Button>
                             </div>
                         </div>
                         <div className="flex flex-row mt-8">
@@ -131,13 +120,9 @@ const SetWeek = () => {
                                 Or set a custom option:
                             </div>
                             <div className="flex-grow relative">
-                                <input type="text" className="input-field" value={custom || ''} onChange={handleChange} />
+                                <Input type="text" value={custom || ''} onChange={handleChange} />
                                 <div className="absolute inset-y-0 right-0 flex items-center">
-                                    <a href="#" onClick={saveCustom}
-                                        className="font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mr-1 ease-linear transition-all duration-150
-                                        text-indigo-600 hover:text-white dark:text-indigo-300 dark:hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-300">
-                                        Save
-                                    </a>
+                                    <Button onClick={saveCustom} color="gray" style="ghost" size="small">Save</Button>
                                 </div>
                             </div>
                         </div>
@@ -148,4 +133,4 @@ const SetWeek = () => {
     );
 }
 
-export default SetWeek;
+export default withWebApps(SetWeek);

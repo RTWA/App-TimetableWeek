@@ -15,7 +15,9 @@ mix
     .setPublicPath('public')
     .js('resources/js/app.js', 'public/TimetableWeek.js').react()
     /**
-     * Uncomment this lines during development to copy your updated JS
+     * Uncomment these lines during development to copy your updated JS
      * file automatically (you must have installed and activated your app)
-     */    
-    .copy('public/TimetableWeek.js', '../../../../public/js/apps/TimetableWeek.js')
+     * 
+     * Update the relative path to your WebApps Directory
+     */
+    .copy('public/TimetableWeek.js', '../../../WebApps/public/js/apps/TimetableWeek.js')

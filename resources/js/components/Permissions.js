@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Loader, Switch } from 'webapps-react';
+
 import UserSuggest from './UserSuggest';
 
 axios.defaults.withCredentials = true;
@@ -12,9 +14,6 @@ const Permissions = () => {
 
     useEffect(() => {
         axios.get('/api/groups')
-            .then(response => {
-                return response;
-            })
             .then(json => {
                 setGroups(json.data.groups);
             })
@@ -23,9 +22,6 @@ const Permissions = () => {
                 console.log(error);
             });
         axios.get('/api/users')
-            .then(response => {
-                return response;
-            })
             .then(json => {
                 setUsers(json.data.users);
             })
@@ -39,9 +35,6 @@ const Permissions = () => {
         formData1.append('permission', 'app.TimetableWeek.%');
 
         axios.post('/api/permissions/search', formData1)
-            .then(response => {
-                return response;
-            })
             .then(json => {
                 setPermissions(json.data.permissions);
             })
@@ -55,9 +48,6 @@ const Permissions = () => {
         formData.append('permission', 'app.TimetableWeek.%');
 
         axios.post('/api/permitted', formData)
-            .then(response => {
-                return response;
-            })
             .then(json => {
                 setPermitted(json.data.users);
             })
@@ -78,9 +68,6 @@ const Permissions = () => {
             formData.append('permission', perm);
 
             axios.post('/api/permissions/user', formData)
-                .then(response => {
-                    return response;
-                })
                 .then(json => {
                     let _permitted = [];
                     permitted.map(function (u,) { _permitted.push(u); });
@@ -97,9 +84,6 @@ const Permissions = () => {
             formData.append('permission', perm);
 
             axios.post('/api/permissions/group', formData)
-                .then(response => {
-                    return response;
-                })
                 .then(json => {
                     let _groups = [];
                     groups.map(function (g) { _groups.push(g);  });
@@ -135,7 +119,7 @@ const Permissions = () => {
 
     // render
     if (permissions.length === 0 && groups.length === 0) {
-        return <div>Loading...</div>
+        return <Loader />
     }
 
     return (
@@ -163,13 +147,10 @@ const Permissions = () => {
                                         return (
                                             <td key={pi} className="px-6">
                                                 <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                                                    <input type="checkbox"
-                                                        checked={checkState(perm, group)}
+                                                    <Switch checked={checkState(perm, group)}
                                                         data-group={group.id}
                                                         data-perm={perm.id}
-                                                        onChange={handleChange}
-                                                        className="checked:bg-gray-500 outline-none focus:ring-0 focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
-                                                    <label className="block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-700 cursor-pointer" />
+                                                        onChange={handleChange} />
                                                 </div>
                                             </td>
                                         )
@@ -192,13 +173,10 @@ const Permissions = () => {
                                         return (
                                             <td key={pi} className="px-6">
                                                 <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                                                    <input type="checkbox"
-                                                        checked={checkState(perm, user)}
+                                                    <Switch checked={checkState(perm, user)}
                                                         data-user={user.id}
                                                         data-perm={perm.id}
-                                                        onChange={handleChange}
-                                                        className="checked:bg-gray-500 outline-none focus:ring-0 focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
-                                                    <label className="block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-700 cursor-pointer" />
+                                                        onChange={handleChange} />
                                                 </div>
                                             </td>
                                         )

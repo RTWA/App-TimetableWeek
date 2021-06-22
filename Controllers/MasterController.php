@@ -2,12 +2,12 @@
 
 namespace WebApps\Apps\TimetableWeek\Controllers;
 
-use Akaunting\Setting\Facade as Setting;
 use App\Http\Controllers\AppsController;
 use DateInterval;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use RobTrehy\LaravelApplicationSettings\ApplicationSettings;
 use SimpleXMLElement;
 
 class MasterController extends AppsController
@@ -22,12 +22,12 @@ class MasterController extends AppsController
     {
         $this->needsProgress();
         $value = [
-            'current' => Setting::get('app.TimetableWeek.current'),
-            'next' => Setting::get('app.TimetableWeek.next'),
-            'active' => Setting::get('app.TimetableWeek.active'),
+            'current' => ApplicationSettings::get('app.TimetableWeek.current'),
+            'next' => ApplicationSettings::get('app.TimetableWeek.next'),
+            'active' => ApplicationSettings::get('app.TimetableWeek.active'),
             'labels' => [
-                'current' => Setting::get('app.TimetableWeek.current_label'),
-                'next' => Setting::get('app.TimetableWeek.next_label')
+                'current' => ApplicationSettings::get('app.TimetableWeek.current_label'),
+                'next' => ApplicationSettings::get('app.TimetableWeek.next_label')
             ]
         ];
 
@@ -38,14 +38,14 @@ class MasterController extends AppsController
         $now = new DateTime();
         $active = new DateTime($value['active']);
 
-        if ((date_format($now, 'N') <= Setting::get('app.TimetableWeek.switchover'))
+        if ((date_format($now, 'N') <= ApplicationSettings::get('app.TimetableWeek.switchover'))
         || (date_format($now, 'H') < date_format($active, 'H'))) {
-            $value['auto']['text'] = Setting::get('app.TimetableWeek.current_label').' '.$value['current'];
-            $value['auto']['html'] = Setting::get('app.TimetableWeek.current_label')
+            $value['auto']['text'] = ApplicationSettings::get('app.TimetableWeek.current_label').' '.$value['current'];
+            $value['auto']['html'] = ApplicationSettings::get('app.TimetableWeek.current_label')
                 .' <span>'.$value['current'].'</span>';
         } else {
-            $value['auto']['text'] = Setting::get('timetable.week.next_label').' '.$value['current'];
-            $value['auto']['html'] = Setting::get('timetable.week.next_label')." <span>".$value['current']."</span>";
+            $value['auto']['text'] = ApplicationSettings::get('timetable.week.next_label').' '.$value['current'];
+            $value['auto']['html'] = ApplicationSettings::get('timetable.week.next_label')." <span>".$value['current']."</span>";
         }
 
         if ($format === 'json') {
@@ -62,12 +62,11 @@ class MasterController extends AppsController
      */
     public function saveConfig(Request $request)
     {
-        Setting::set('app.TimetableWeek.current', $request->input('current'));
-        Setting::set('app.TimetableWeek.next', $request->input('next'));
-        Setting::set('app.TimetableWeek.current_label', $request->input('currentLabel'));
-        Setting::set('app.TimetableWeek.next_label', $request->input('nextLabel'));
-        Setting::set('app.TimetableWeek.active', $request->input('active'));
-        Setting::save();
+        ApplicationSettings::set('app.TimetableWeek.current', $request->input('current'));
+        ApplicationSettings::set('app.TimetableWeek.next', $request->input('next'));
+        ApplicationSettings::set('app.TimetableWeek.current_label', $request->input('currentLabel'));
+        ApplicationSettings::set('app.TimetableWeek.next_label', $request->input('nextLabel'));
+        ApplicationSettings::set('app.TimetableWeek.active', $request->input('active'));
 
         return response()->json(['success' => true], 201);
     }
@@ -77,8 +76,7 @@ class MasterController extends AppsController
      */
     public function next(Request $request)
     {
-        Setting::set('app.TimetableWeek.next', json_decode($request->input('next'), true));
-        Setting::save();
+        ApplicationSettings::set('app.TimetableWeek.next', json_decode($request->input('next'), true));
 
         return response()->json([
             'success' => true,
@@ -92,13 +90,12 @@ class MasterController extends AppsController
     private function needsProgress()
     {
         $now = new DateTime();
-        $active = new DateTime(Setting::get('app.TimetableWeek.active'));
+        $active = new DateTime(ApplicationSettings::get('app.TimetableWeek.active'));
 
         if ($now >= $active) {
-            Setting::set('app.TimetableWeek.current', Setting::get('app.TimetableWeek.next'));
-            Setting::set('app.TimetableWeek.next', 'Not Set');
-            Setting::set('app.TimetableWeek.active', $active->add(new DateInterval('P7D'))->format('Y-m-d H:i:s'));
-            Setting::save();
+            ApplicationSettings::set('app.TimetableWeek.current', ApplicationSettings::get('app.TimetableWeek.next'));
+            ApplicationSettings::set('app.TimetableWeek.next', 'Not Set');
+            ApplicationSettings::set('app.TimetableWeek.active', $active->add(new DateInterval('P7D'))->format('Y-m-d H:i:s'));
         }
     }
 
