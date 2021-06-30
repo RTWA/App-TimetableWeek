@@ -2,35 +2,14 @@
 
 namespace WebApps\Apps\TimetableWeek\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use RobTrehy\LaravelApplicationSettings\ApplicationSettings;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use App\Http\Controllers\AppManagerController as ManagerController;
 
-class AppManagerController extends Controller
+class AppManagerController extends ManagerController
 {
-    public $name;
-    public $slug;
-    public $icon;
-    public $version;
-    public $author;
-
-    public $menu;
-    public $routes;
-
-    private $manifest;
-
+    
     public function __construct()
     {
-        $this->manifest = json_decode(file_get_contents(__DIR__.'/../manifest.json'), true);
-        $this->name = $this->manifest['name'];
-        $this->slug = $this->manifest['slug'];
-        $this->icon = $this->manifest['icon'];
-        $this->version = $this->manifest['version'];
-        $this->author = $this->manifest['author'];
-        $this->menu = $this->manifest['menu'];
-        $this->routes = $this->manifest['routes'];
+        parent::__construct(json_decode(file_get_contents(__DIR__.'/../manifest.json'), true));
     }
 
     public function install()
@@ -49,82 +28,6 @@ class AppManagerController extends Controller
         $this->dropAppJS();
     }
 
-    /**
-     * TODO: This needs centralising
-     */
-    private function createPermissions()
-    {
-        $admin = Role::findByName('Administrators', 'web');
-
-        foreach ($this->manifest['permissions'] as $permission) {
-            if (Permission::where('name', $permission['name'])
-                    ->where('guard_name', $permission['guard'])
-                    ->first() === null) {
-                $p = Permission::create([
-                    'name' => $permission['name'],
-                    'title' => $permission['title'],
-                    'guard_name' => $permission['guard'],
-                ]);
-                if ($permission['admin']) {
-                    $admin->givePermissionTo($p);
-                }
-            }
-        }
-    }
-
-    /**
-     * TODO: This needs centralising
-     */
-    private function dropPermissions()
-    {
-        foreach ($this->manifest['permissions'] as $permission) {
-            $p = Permission::where('name', $permission['name'])
-                ->where('guard_name', $permission['guard'])
-                ->first();
-            if ($p <> null) {
-                // Revoke direct user permissions
-                $users = User::permission($permission['name'])->get();
-                foreach ($users as $user) {
-                    $user->revokePermissionTo($p);
-                }
-                // Revoke all role permissions
-                $roles = Role::all();
-                foreach ($roles as $role) {
-                    $role->revokePermissionTo($permission);
-                }
-                
-                $p->delete();
-            }
-        }
-    }
-
-    /**
-     * TODO: This needs centralising
-     */
-    private function createSettings()
-    {
-        foreach ($this->manifest['settings'] as $setting) {
-            if (ApplicationSettings::get($setting['key']) === null) {
-                ApplicationSettings::set($setting['key'], (is_array($setting['value']))
-                                                    ? json_encode($setting['value'])
-                                                    : $setting['value']);
-            }
-        }
-    }
-
-    /**
-     * TODO: This needs centralising
-     */
-    private function dropSettings()
-    {
-        foreach ($this->manifest['settings'] as $setting) {
-            ApplicationSettings::delete($setting['key']);
-        }
-    }
-
-    /**
-     * TODO: This needs centralising
-     */
     private function copyAppJS()
     {
         $js = __DIR__.'/../public/'.$this->slug.'.js';
@@ -139,10 +42,7 @@ class AppManagerController extends Controller
         }
         copy($js, $path.$this->slug.'.js');
     }
-
-    /**
-     * TODO: This needs centralising
-     */
+    
     private function dropAppJS()
     {
         $path = public_path("js/apps/");
