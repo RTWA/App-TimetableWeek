@@ -26,6 +26,10 @@ class TimetableWeekServiceProvider extends ServiceProvider
         $folders = ["Controllers"];
         foreach ($folders as $folder) {
             foreach (GLOB(__DIR__.'/../'.$folder.'/*.php') as $file) {
+                $className = str_replace(__DIR__.'/../'.$folder.'/', '', str_replace('.php', '', $file));
+                if ($folder === 'Controllers' && class_exists($this->namespace.'\\'.$className)) {
+                    continue;
+                }
                 include $file;
             }
         }
@@ -56,7 +60,7 @@ class TimetableWeekServiceProvider extends ServiceProvider
             'namespace' => $this->namespace,
             'prefix' => 'apps/TimetableWeek'
         ], function () {
-            require App::path() . 'TimetableWeek/routes/web.php';
+            require App::path() . 'TimetableWeek/Routes/web.php';
         });
     }
 
@@ -72,7 +76,7 @@ class TimetableWeekServiceProvider extends ServiceProvider
             'namespace' => $this->namespace,
             'prefix' => 'api/apps/TimetableWeek'
         ], function () {
-            require App::path() . 'TimetableWeek/routes/api.php';
+            require App::path() . 'TimetableWeek/Routes/api.php';
         });
     }
 }
