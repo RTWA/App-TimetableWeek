@@ -2,9 +2,9 @@
 
 namespace WebApps\Apps\TimetableWeek\Controllers;
 
-use App\Http\Controllers\AppManagerController as ManagerController;
+use App\Http\Controllers\AppManagerController as Controller;
 
-class AppManagerController extends ManagerController
+class AppManagerController extends Controller
 {
     
     public function __construct()
