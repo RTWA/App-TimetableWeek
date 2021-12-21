@@ -13,6 +13,13 @@ const mix = require('laravel-mix');
 
 mix
     .setPublicPath('public')
+    .webpackConfig({
+        resolve: {
+            fallback: {
+                path: require.resolve('path-browserify'),
+            }
+        }
+    })
     .js('resources/js/app.js', 'public/TimetableWeek.js').react()
     /**
      * Uncomment these lines during development to copy your updated JS
