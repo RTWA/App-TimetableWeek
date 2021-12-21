@@ -33,8 +33,6 @@ class TimetableWeekServiceProvider extends ServiceProvider
                 include $file;
             }
         }
-        // Add the Apps views
-        $this->loadViewsFrom(__DIR__.'/../Views', "TimetableWeek");
     }
 
     /**
@@ -55,13 +53,7 @@ class TimetableWeekServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        Route::group([
-            'middleware' => 'web',
-            'namespace' => $this->namespace,
-            'prefix' => 'apps/TimetableWeek'
-        ], function () {
-            require App::path() . 'TimetableWeek/Routes/web.php';
-        });
+        return null;
     }
 
     /**
