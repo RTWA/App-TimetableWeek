@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import { useToasts } from 'react-toast-notifications';
-import { Button, Input, Loader, withWebApps } from 'webapps-react';
+import { Button, Input, Loader, useToasts, withWebApps } from 'webapps-react';
 
 axios.defaults.withCredentials = true;
 
@@ -33,7 +32,6 @@ const SetWeek = ({ UI }) => {
     }, []);
 
     const setData = value => {
-
         let formData = new FormData();
         formData.append("next", JSON.stringify(value));
 
@@ -42,10 +40,10 @@ const SetWeek = ({ UI }) => {
                 return response;
             })
             .then(json => {
-                addToast(json.data.message, { appearance: 'success' });
+                addToast(json.data.message, '', { appearance: 'success' });
             })
             .catch(error => {
-                addToast(error.response.data.message || "Failed to save! " + error.response.statusText, { appearance: 'error' });
+                addToast(error.response.data.message || "Failed to save!", error.response.statusText, { appearance: 'error' });
             });
     }
 

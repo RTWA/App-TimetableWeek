@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import classNames from 'classnames';
-import { useToasts } from 'react-toast-notifications';
-import { Button, Input, Loader, WebAppsContext } from 'webapps-react';
+import { Button, Input, Loader, useToasts, WebAppsContext } from 'webapps-react';
 
 import Permissions from './Permissions';
 
@@ -47,7 +46,7 @@ const Settings = () => {
 
         axios.post('/api/apps/TimetableWeek/settings', formData)
             .then(json => {
-                addToast("Settings Saved", { appearance: 'success'});
+                addToast("Settings Saved", '', { appearance: 'success'});
                 
                 setState('saved');
                 setTimeout(() => {
@@ -55,7 +54,7 @@ const Settings = () => {
                 }, 2500);
             })
             .catch(error => {
-                addToast(error.response.data.message || "Failed to save! " + error.response.statusText, { appearance: 'error'});
+                addToast(error.response.data.message || "Failed to save!", error.response.statusText, { appearance: 'error'});
 
                 setState('error');
                 setTimeout(() => {
