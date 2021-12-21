@@ -152,6 +152,7 @@ const Settings = () => {
                 </div>
 
                 <Button onClick={setData} style="outline">Save Settings</Button>
+                <Button href="/api/apps/TimetableWeek/value.json" target="_blank" style="link" size="small" color="gray" className="ml-6">View API Endpoint</Button>
             </div>
             <div className={paneClass(1)}>
                 <Permissions />

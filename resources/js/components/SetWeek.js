@@ -14,11 +14,8 @@ const SetWeek = ({ UI }) => {
 
     const { addToast } = useToasts();
 
-    useEffect(() => {
-        axios.get('/api/apps/TimetableWeek/value.json')
-            .then(response => {
-                return response;
-            })
+    useEffect(async () => {
+        await axios.get('/api/apps/TimetableWeek/value.json')
             .then(json => {
                 setCurrent(json.data.value.current);
                 setNext(json.data.value.next);
@@ -31,14 +28,11 @@ const SetWeek = ({ UI }) => {
             });
     }, []);
 
-    const setData = value => {
+    const setData = async value => {
         let formData = new FormData();
         formData.append("next", JSON.stringify(value));
 
-        axios.post('/api/apps/TimetableWeek/next', formData)
-            .then(response => {
-                return response;
-            })
+        await axios.post('/api/apps/TimetableWeek/next', formData)
             .then(json => {
                 addToast(json.data.message, '', { appearance: 'success' });
             })
@@ -65,16 +59,16 @@ const SetWeek = ({ UI }) => {
     const settingsBtn = () => {
         if (settings) {
             return (
-                <div>
+                <>
                     <hr className="my-4" />
-                    <Button to="/settings" style="outline" color="gray" className="float-left flex">
+                    <Button to="/settings" style="outline" color="gray" className="inline-flex">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         App Settings
                     </Button>
-                </div>
+                </>
             )
         }
     }
@@ -85,44 +79,40 @@ const SetWeek = ({ UI }) => {
 
     const _active = moment(active);
     return (
-        <div className="grid grid-cols-2">
-            <div className="overflow-hidden rounded-lg shadow-lg bg-white dark:bg-gray-800 text-center mx-12 p-4">
-                <div>
-                    <h2 className="text-medium">The currently selected option is: <strong>{current}</strong></h2>
-                    <h4 className="text-sm">The next selected option is: <strong>{next}</strong></h4>
-                    <hr className="my-4" />
-                    <p>The next option will be active
-                                from {_active.format('ha')} on {_active.format('dddd Do MMMM Y')}</p>
-                    {settingsBtn()}
-                </div>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="overflow-hidden rounded shadow-lg bg-white dark:bg-gray-800 text-center p-4">
+                <h2 className="text-medium">The currently selected option is: <strong>{current}</strong></h2>
+                <h4 className="text-sm">The next selected option is: <strong>{next}</strong></h4>
+                <hr className="my-4" />
+                <p>The next option will be active
+                    from {_active.format('ha')} on {_active.format('dddd Do MMMM Y')}</p>
+                {settingsBtn()}
             </div>
 
-            <div>
-                <div className="rounded-lg shadow-lg mx-12 p-4 bg-white dark:bg-gray-800 ">
-                    <div className={`text-${UI.theme}-600 dark:text-${UI.theme}-300`}><strong>Select the next option</strong></div>
-                    <div className="text-center">
-                        <div className="flex flex-row mt-4">
-                            <div className="flex-grow text-center">
-                                <Button data-week="Week A" onClick={handleClick} style="outline">
-                                    Week A
-                                </Button>
-                            </div>
-                            <div className="flex-grow text-center">
-                                <Button data-week="Week B" onClick={handleClick} style="outline">
-                                    Week B
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="flex flex-row mt-8">
-                            <div className="flex-grow pt-2">
-                                Or set a custom option:
-                            </div>
-                            <div className="flex-grow relative">
-                                <Input type="text" value={custom || ''} onChange={handleChange} />
-                                <div className="absolute inset-y-0 right-0 flex items-center">
-                                    <Button onClick={saveCustom} color="gray" style="ghost" size="small">Save</Button>
-                                </div>
-                            </div>
+            <div className="rounded shadow-lg p-4 bg-white dark:bg-gray-800 ">
+                <div className="font-bold">Select the next option</div>
+                <div className="flex flex-row mt-4">
+                    <div className="flex-grow text-center">
+                        <Button data-week="Week A" onClick={handleClick} style="outline">
+                            Week A
+                        </Button>
+                    </div>
+                    <div className="flex-grow text-center">
+                        <Button data-week="Week B" onClick={handleClick} style="outline">
+                            Week B
+                        </Button>
+                    </div>
+                </div>
+                <div className="flex flex-col xl:flex-row py-4">
+                    <label className="w-full xl:w-4/12 xl:py-2 font-medium xl:font-normal text-sm xl:text-base" htmlFor="custom_val">Or set a custom option:</label>
+                    <div className="relative w-full">
+                        <Input name="custom_val" id="custom_val" type="text" value={custom || ''} onChange={handleChange} />
+                        <div className="w-full sm:w-auto sm:absolute inset-y-0 right-0 sm:flex items-center">
+                            <Button style="ghost" color="gray" size="small" square
+                                className="uppercase mr-1 w-full sm:w-auto sm:rounded-md"
+                                onClick={saveCustom}>
+                                Save
+                            </Button>
                         </div>
                     </div>
                 </div>
