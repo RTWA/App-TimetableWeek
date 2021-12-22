@@ -44,8 +44,8 @@ class MasterController extends AppsController
             $value['auto']['html'] = ApplicationSettings::get('app.TimetableWeek.current_label')
                 .' <span>'.$value['current'].'</span>';
         } else {
-            $value['auto']['text'] = ApplicationSettings::get('timetable.week.next_label').' '.$value['current'];
-            $value['auto']['html'] = ApplicationSettings::get('timetable.week.next_label')." <span>".$value['current']."</span>";
+            $value['auto']['text'] = ApplicationSettings::get('app.TimetableWeek.next_label').' '.$value['current'];
+            $value['auto']['html'] = ApplicationSettings::get('app.TimetableWeek.next_label')." <span>".$value['current']."</span>";
         }
 
         if ($format === 'json') {
