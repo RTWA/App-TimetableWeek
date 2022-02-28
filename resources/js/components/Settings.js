@@ -1,11 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
 import classNames from 'classnames';
-import { Button, Input, Loader, useToasts, WebAppsContext } from 'webapps-react';
+import { APIClient, Button, Input, Loader, useToasts, WebAppsContext } from 'webapps-react';
 
 import Permissions from './Permissions';
-
-axios.defaults.withCredentials = true;
 
 const Settings = () => {
     const [state, setState] = useState('');
@@ -19,8 +16,10 @@ const Settings = () => {
     const { UI } = useContext(WebAppsContext);
     const { addToast } = useToasts();
 
+    const APIController = new AbortController();
+
     useEffect(async () => {
-        await axios.get('/api/apps/TimetableWeek/value.json')
+        await APIClient('/api/apps/TimetableWeek/value.json', undefined, { signal: APIController.signal })
             .then(json => {
                 setCurrent(json.data.value.current);
                 setNext(json.data.value.next);
@@ -29,22 +28,31 @@ const Settings = () => {
                 setNextLabel(json.data.value.labels.next);
             })
             .catch(error => {
-                // TODO: Handle errors
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // TODO: Handle errors
+                    console.log(error);
+                }
             });
+
+        return () => {
+            APIController.abort()
+        }
     }, []);
 
     const setData = async () => {
         setState('saving');
 
-        let formData = new FormData();
-        formData.append("current", current);
-        formData.append("next", next);
-        formData.append("active", active);
-        formData.append("currentLabel", currentLabel);
-        formData.append("nextLabel", nextLabel);
-
-        await axios.post('/api/apps/TimetableWeek/settings', formData)
+        await APIClient('/api/apps/TimetableWeek/settings',
+            {
+                current: current,
+                next: next,
+                active: active,
+                currentLabel: currentLabel,
+                nextLabel: nextLabel
+            },
+            {
+                signal: APIController.signal
+            })
             .then(json => {
                 addToast("Settings Saved", '', { appearance: 'success' });
 
@@ -54,12 +62,14 @@ const Settings = () => {
                 }, 2500);
             })
             .catch(error => {
-                addToast(error.response.data.message || "Failed to save!", error.response.statusText, { appearance: 'error' });
+                if (!error.status?.isAbort) {
+                    addToast(error.response.data.message || "Failed to save!", error.response.statusText, { appearance: 'error' });
 
-                setState('error');
-                setTimeout(() => {
-                    setState('');
-                }, 2500);
+                    setState('error');
+                    setTimeout(() => {
+                        setState('');
+                    }, 2500);
+                }
             });
     }
 

@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import moment from 'moment';
-import { Button, Input, Loader, useToasts, withWebApps } from 'webapps-react';
+import { APIClient, Button, Input, Loader, useToasts } from 'webapps-react';
 
-axios.defaults.withCredentials = true;
-
-const SetWeek = ({ UI }) => {
+const SetWeek = () => {
     const [current, setCurrent] = useState('loading');
     const [next, setNext] = useState('Not Set');
     const [active, setActive] = useState('0000-00-00 00:00:00');
@@ -14,8 +11,10 @@ const SetWeek = ({ UI }) => {
 
     const { addToast } = useToasts();
 
+    const APIController = new AbortController();
+
     useEffect(async () => {
-        await axios.get('/api/apps/TimetableWeek/value.json')
+        await APIClient('/api/apps/TimetableWeek/value.json', undefined, { signal: APIController.signal })
             .then(json => {
                 setCurrent(json.data.value.current);
                 setNext(json.data.value.next);
@@ -23,21 +22,26 @@ const SetWeek = ({ UI }) => {
                 setSettings(json.data.value.settings);
             })
             .catch(error => {
-                // TODO: Handle errors
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // TODO: Handle errors
+                    console.log(error);
+                }
             });
+
+        return () => {
+            APIController.abort()
+        }
     }, []);
 
     const setData = async value => {
-        let formData = new FormData();
-        formData.append("next", JSON.stringify(value));
-
-        await axios.post('/api/apps/TimetableWeek/next', formData)
+        await APIClient('/api/apps/TimetableWeek/next', { next: JSON.stringify(value) }, { signal: APIController.signal })
             .then(json => {
                 addToast(json.data.message, '', { appearance: 'success' });
             })
             .catch(error => {
-                addToast(error.response.data.message || "Failed to save!", error.response.statusText, { appearance: 'error' });
+                if (!error.status?.isAbort) {
+                    addToast(error.response.data.message || "Failed to save!", error.response.statusText, { appearance: 'error' });
+                }
             });
     }
 
@@ -122,4 +126,4 @@ const SetWeek = ({ UI }) => {
     );
 }
 
-export default withWebApps(SetWeek);
+export default SetWeek;
