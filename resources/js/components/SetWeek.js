@@ -91,7 +91,7 @@ const SetWeek = ({ UI }) => {
 
             <div className="rounded shadow-lg p-4 bg-white dark:bg-gray-800 ">
                 <div className="font-bold">Select the next option</div>
-                <div className="flex flex-row mt-4">
+                <div className="flex flex-row my-4">
                     <div className="flex-grow text-center">
                         <Button data-week="Week A" onClick={handleClick} style="outline">
                             Week A
@@ -103,19 +103,20 @@ const SetWeek = ({ UI }) => {
                         </Button>
                     </div>
                 </div>
-                <div className="flex flex-col xl:flex-row py-4">
-                    <label className="w-full xl:w-4/12 xl:py-2 font-medium xl:font-normal text-sm xl:text-base" htmlFor="custom_val">Or set a custom option:</label>
-                    <div className="relative w-full">
-                        <Input name="custom_val" id="custom_val" type="text" value={custom || ''} onChange={handleChange} />
-                        <div className="w-full sm:w-auto sm:absolute inset-y-0 right-0 sm:flex items-center">
-                            <Button style="ghost" color="gray" size="small" square
-                                className="uppercase mr-1 w-full sm:w-auto sm:rounded-md"
-                                onClick={saveCustom}>
-                                Save
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                <Input
+                    name="custom_val"
+                    id="custom_val"
+                    label="Or set a custom option:"
+                    type="text"
+                    value={custom || ''}
+                    onChange={handleChange}
+                    action={
+                        <Button style="ghost" color="gray" size="small" square
+                            className="uppercase mr-1 w-full sm:w-auto sm:rounded-md"
+                            onClick={saveCustom}>
+                            Save
+                        </Button>
+                    } />
             </div>
         </div>
     );
