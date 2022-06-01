@@ -1,5 +1,5 @@
 # Version 1.0.2
-## Whats's Changed?
+## What's Changed?
 - Speed improvements
 - Security improvements
 - UI improvements
