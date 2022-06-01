@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import classNames from 'classnames';
-import { APIClient, Button, Input, Loader, useToasts, WebAppsContext } from 'webapps-react';
+import { APIClient, Button, Input, Loader, PageWrapper, useToasts, WebAppsUXContext } from 'webapps-react';
 
 import Permissions from './Permissions';
 
@@ -13,7 +13,7 @@ const Settings = () => {
     const [nextLabel, setNextLabel] = useState('');
     const [tab, setTab] = useState(0);
 
-    const { UI } = useContext(WebAppsContext);
+    const { theme } = useContext(WebAppsUXContext);
     const { addToast } = useToasts();
 
     const APIController = new AbortController();
@@ -104,8 +104,8 @@ const Settings = () => {
         'focus:outline-none',
         (tab === id) ? 'border-b-2' : '',
         (tab === id) ? 'font-medium' : '',
-        (tab === id) ? `border-${UI.theme}-600` : '',
-        (tab === id) ? `dark:border-${UI.theme}.300` : ''
+        (tab === id) ? `border-${theme}-600` : '',
+        (tab === id) ? `dark:border-${theme}.300` : ''
     )
 
     const paneClass = id => classNames(
@@ -119,72 +119,80 @@ const Settings = () => {
     }
 
     return (
-        <div className="flex flex-col min-w-0 break-words w-full mx-auto shadow bg-white dark:bg-gray-800 rounded">
-            <nav className="flex flex-col sm:flex-row border-b border-gray-200 dark:border-gray-600">
-                <button className={tabClass(0)} onClick={() => setTab(0)}>
-                    App Settings
-                </button>
-                <button className={tabClass(1)} onClick={() => setTab(1)}>
-                    App Permissions
-                </button>
-            </nav>
-            <div className={paneClass(0)}>
-                <p className="font-bold mb-2">Manually override the current and next values</p>
-                <Input
-                    type="text"
-                    name="current"
-                    id="current"
-                    label="Current Value"
-                    value={current}
-                    onChange={handleChange}
-                    state={state} />
-                <Input
-                    type="text"
-                    name="next"
-                    id="next"
-                    label="Next Value"
-                    value={next}
-                    onChange={handleChange}
-                    state={state} />
+        <PageWrapper title="Timetable Week">
+            <div className="flex flex-col min-w-0 break-words w-full mx-auto shadow bg-white dark:bg-gray-800 rounded">
+                <nav className="flex flex-col sm:flex-row border-b border-gray-200 dark:border-gray-600">
+                    <button className={tabClass(0)} onClick={() => setTab(0)}>
+                        App Settings
+                    </button>
+                    <button className={tabClass(1)} onClick={() => setTab(1)}>
+                        App Permissions
+                    </button>
+                </nav>
+                <div className={paneClass(0)}>
+                    <p className="font-bold mb-2">Manually override the current and next values</p>
+                    <Input
+                        type="text"
+                        name="current"
+                        id="current"
+                        label="Current Value"
+                        value={current}
+                        onChange={handleChange}
+                        state={state}
+                    />
+                    <Input
+                        type="text"
+                        name="next"
+                        id="next"
+                        label="Next Value"
+                        value={next}
+                        onChange={handleChange}
+                        state={state}
+                    />
 
-                <p className="font-bold mt-10 mb-2">Re-phrase the prefix text</p>
-                <Input
-                    type="text"
-                    name="currentLabel"
-                    id="currentLabel"
-                    label='"This week" label'
-                    value={currentLabel}
-                    onChange={handleChange}
-                    state={state} />
-                <Input
-                    type="text"
-                    name="nextLabel"
-                    id="nextLabel"
-                    label='"Next week" label'
-                    value={nextLabel}
-                    onChange={handleChange}
-                    state={state} />
+                    <p className="font-bold mt-10 mb-2">Re-phrase the prefix text</p>
+                    <Input
+                        type="text"
+                        name="currentLabel"
+                        id="currentLabel"
+                        label='"This week" label'
+                        value={currentLabel}
+                        onChange={handleChange}
+                        state={state}
+                    />
+                    <Input
+                        type="text"
+                        name="nextLabel"
+                        id="nextLabel"
+                        label='"Next week" label'
+                        value={nextLabel}
+                        onChange={handleChange}
+                        state={state}
+                    />
 
-                <p className="font-bold mt-10 mb-2">Change switchover date and time</p>
-                <Input
-                    type="text"
-                    name="active"
-                    id="active"
-                    label="Switchover Date & Time"
-                    value={active}
-                    onChange={handleChange}
-                    state={state} helpText={
-                        <>Format must be YYYY-MM-DD HH:MM:SS<br />
-                            The next value will be current at the time and date here.</>
-                    } />
+                    <p className="font-bold mt-10 mb-2">Change switchover date and time</p>
+                    <Input
+                        type="text"
+                        name="active"
+                        id="active"
+                        label="Switchover Date & Time"
+                        value={active}
+                        onChange={handleChange}
+                        state={state}
+                        helpText={
+                            <>Format must be YYYY-MM-DD HH:MM:SS<br />
+                                The next value will be current at the time and date here.</>
+                        }
+                    />
 
-                <Button onClick={setData} style="outline">Save Settings</Button>
-                <Button href="/api/apps/TimetableWeek/value.json" target="_blank" style="link" size="small" color="gray" className="ml-6">View API Endpoint</Button>
+                    <Button onClick={setData} type="outline">Save Settings</Button>
+                    <Button href="/api/apps/TimetableWeek/value.json" target="_blank" type="link" size="small" color="gray" className="ml-6">View API Endpoint</Button>
+                </div>
+                <div className={paneClass(1)}>
+                    <Permissions />
+                </div>
             </div>
-            <div className={paneClass(1)}>
-                <Permissions />
-            </div>
-        </div>
+        </PageWrapper>
     )
 }
 
