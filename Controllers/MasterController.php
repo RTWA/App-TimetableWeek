@@ -38,7 +38,7 @@ class MasterController extends AppsController
         $now = new DateTime();
         $active = new DateTime($value['active']);
 
-        if ((date_format($now, 'N') <= ApplicationSettings::get('app.TimetableWeek.switchover'))
+        if ((date_format($now, 'N') <= date_format($active, 'N'))
         || (date_format($now, 'H') < date_format($active, 'H'))) {
             $value['auto']['text'] = ApplicationSettings::get('app.TimetableWeek.current_label').' '.$value['current'];
             $value['auto']['html'] = ApplicationSettings::get('app.TimetableWeek.current_label')
